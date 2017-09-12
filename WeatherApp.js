@@ -169,6 +169,19 @@ function GenerateQuickButtons(item) {
     GenerateSingleButton(item.city);
 }
 
+function localStorageFunction(){
+  if(!typeof(localStorage)) {
+    $(".messageLabel").text("(Sorry local storage is not supported by your browser)").css("color","orange");
+  } else {
+    if(!localStorage.getItem("queryedCityData")) {
+      localStorage.setItem("queryedCityData", JSON.stringify([]));
+    } else {
+      let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
+      cityData.forEach(GenerateQuickButtons);
+    }
+  }
+}
+
 $(document).ready(function() {
     if(detectmob()) {
         $(".searchLabel").text("Enter city name: ");
@@ -176,16 +189,7 @@ $(document).ready(function() {
         $(".messageLabel").remove();
     }
 
-    if(!typeof(localStorage)) {
-        $(".messageLabel").text("(Sorry local storage is not supported by your browser)").css("color","orange");
-    } else {
-        if(!localStorage.getItem("queryedCityData")) {
-            localStorage.setItem("queryedCityData", JSON.stringify([]));
-        } else {
-            let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
-            cityData.forEach(GenerateQuickButtons);
-        }
-    }
+    localStorageFunction();
 
     $("input#searchBox").on("focus",function() {
         searchBoxIsFocused = true;
@@ -223,6 +227,7 @@ $(document).ready(function() {
     $(".clearAllButton").on("click",function() {
         localStorage.removeItem("queryedCityData");
         $(".quickButtonsPlaceHolder").empty();
+        localStorageFunction();
     });
 
     $("div.searchBoxDiv").on("click", "input.submitButtonEnter", function() {

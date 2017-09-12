@@ -83,6 +83,7 @@ h2 {
 
 .quickButtonsPlaceHolder {
   padding: 0px;
+  margin: 0px 0px 10px 5px;
 }
 
 .clearAllButton, .submitButtonEnter {
@@ -152,9 +153,14 @@ h2 {
             padding: 10px;
         }
 
+        .queryHolderV {
+            display : block;
+            text-align: center;
+            margin-left: 10px;
+        }
+
       .quickButtonsPlaceHolder {
-            margin: 50px 150px 0px 150px;
-            padding: 25px;
+            margin : 10px 0px 30px 20px;
         }
 
       .clearAllButton {

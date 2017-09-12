@@ -27,6 +27,8 @@ function GetCurrentMillis() {
 }
 
 function getDirection(wind) {
+    if(wind < 0 || wind > 360 || !wind) return "Invalid";
+    wind = parseFloat(wind.toPrecision(2));
     let direction = "";
     for(let i=compassDirections.length-1; i>=0; i--) {
         if(i===0) {
@@ -79,12 +81,10 @@ function GetWeatherInfo(cityName) {
             if(data.cod === 200) {
                 let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
                 let city = data.name;
-                console.log(IsAlreadyAdded(cityData, city));
                 if(!IsAlreadyAdded(cityData, city)) {
                     GenerateSingleButton(city);
                     cityData.push({"city": city, "data": data, "time": GetCurrentMillis()});
                     localStorage.setItem("queryedCityData", JSON.stringify(cityData));
-                    console.log(cityData);
                 }
                 DisplayWeather(data);
                 $(".messageLabel").text("(Successful query)").css("color","green");
@@ -96,7 +96,7 @@ function GetWeatherInfo(cityName) {
     }
 
 function IsAlreadyAdded(cityData, city) {
-    if(cityData === null) return true;
+    if(!cityData || !city) return false;
     for(let j=0; j<cityData.length; j++) {
         if(cityData[j].city === city) {
             return true;
@@ -131,12 +131,12 @@ function GenerateSingleButton(city) {
     $(".quickButtonsPlaceHolder").append(html);
 }
 
-function GenerateQuickButtons(item, index) {
+function GenerateQuickButtons(item) {
+    if(!item || !item.city) return false;
     GenerateSingleButton(item.city);
 }
 
 $(document).ready(function() {
-    console.log(detectmob());
     if(detectmob()) {
         $(".searchLabel").text("Enter city name: ");
         $("<input type='submit' value='Get weather' class='submitButtonEnter'/>").insertAfter("input#searchBox");

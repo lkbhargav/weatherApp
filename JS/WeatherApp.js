@@ -1,6 +1,8 @@
 var searchBoxIsFocused = true;
 var weatherUnit;
 var speedUnit;
+var config;
+
 var compassDirections = [{"Key":"348.75", "Value":"North"}, 
                         {"Key":"11.25", "Value":"North NorthEast"},
                         {"Key":"33.75", "Value":"NorthEast"},
@@ -77,22 +79,26 @@ function DisplayWeather(data) {
 
 function GetWeatherInfo(cityName) {
     if(!CheckDataFromButtons(cityName))
-        $.getJSON("http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=45b059433bebd3ff4885be4bf7e59a7c&units=metric", function(data) {
-            if(data.cod === 200) {
-                let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
-                let city = data.name;
-                if(!IsAlreadyAdded(cityData, city)) {
-                    GenerateSingleButton(city);
-                    cityData.push({"city": city, "data": data, "time": GetCurrentMillis()});
-                    localStorage.setItem("queryedCityData", JSON.stringify(cityData));
+        if(config.WEATHER_API_KEY) {
+            $.getJSON("http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid="+config.WEATHER_API_KEY+"&units=metric", function(data) {
+                if(data.cod === 200) {
+                    let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
+                    let city = data.name;
+                    if(!IsAlreadyAdded(cityData, city)) {
+                        GenerateSingleButton(city);
+                        cityData.push({"city": city, "data": data, "time": GetCurrentMillis()});
+                        localStorage.setItem("queryedCityData", JSON.stringify(cityData));
+                    }
+                    DisplayWeather(data);
+                    $(".messageLabel").text("(Successful query)").css("color","green");
                 }
-                DisplayWeather(data);
-                $(".messageLabel").text("(Successful query)").css("color","green");
-            }
-        }).fail(function(data) {
-            $(".actualWeatherData").empty();
-            $(".messageLabel").text("("+data.responseJSON.message+")").css("color","red");
-        });
+            }).fail(function(data) {
+                $(".actualWeatherData").empty();
+                $(".messageLabel").text("("+data.responseJSON.message+")").css("color","red");
+            });
+        } else {
+            $(".messageLabel").text("(Server error parsing API key.)").css("color","red");
+        }
     }
 
 function IsAlreadyAdded(cityData, city) {
@@ -137,6 +143,11 @@ function GenerateQuickButtons(item) {
 }
 
 $(document).ready(function() {
+    
+    $.getJSON("http://32.208.112.166/ConfigParser/ConfigParser.php?name=WAPP", function(data) {
+        config = data;
+    });
+    
     if(detectmob()) {
         $(".searchLabel").text("Enter city name: ");
         $("<input type='submit' value='Get weather' class='submitButtonEnter'/>").insertAfter("input#searchBox");

@@ -1,7 +1,7 @@
 var searchBoxIsFocused = true;
 var weatherUnit;
 var speedUnit;
-var compassDirections = [{"Key":"348.75", "Value":"North"}, 
+var compassDirections = [{"Key":"348.75", "Value":"North"},
                         {"Key":"11.25", "Value":"North NorthEast"},
                         {"Key":"33.75", "Value":"NorthEast"},
                         {"Key":"56.25", "Value":"East NorthEast"},
@@ -63,7 +63,7 @@ function DisplayWeather(data) {
     } else {
         degree = "Unknown";
     }
-    
+
     let html = "<h2>"+data.main.temp+" &#x2103;</h2>";
     html += "<h3>"+data.weather[0].main+"</h3>";
     html += "<img class='weatherImageAlignment' src='http://openweathermap.org/img/w/"+data.weather[0].icon+".png' />";
@@ -71,8 +71,41 @@ function DisplayWeather(data) {
     html += "<div class='leftDiv'> <h4> Sunrise: " +DateFormatter(data.sys.sunrise)+ "</h4><h4> Sunset: " +DateFormatter(data.sys.sunset)+ "</h4><h4> Humidity: " +data.main.humidity+ "%</h4></div>";
     html += "<div class='leftDiv'> <h4> Pressure: " +data.main.pressure+ "</h4><h4> Wind direction: " +degree+ " </h4><h4> Wind speed: " +data.wind.speed+ " kilometer(s)/hour</h4></div>";
     $(".actualWeatherData").empty().append(html);
-    
+
     $("h1.mainHead").text(data.name+" ("+data.sys.country+")");
+}
+
+function suggestCityNames(cityname){
+    $.ajax({
+      url: "http://autocompletecity.geobytes.com/AutoCompleteCity?callback=?&sort=size&q=" + cityname,
+      dataType : "json",
+      success : getCityNames
+    })
+}
+
+function getCityNames(results){
+  console.log("get city names");
+  $("#city").empty();
+  var i;
+  var myArray = [];
+  for(i=0; i < results.length; i++){
+    var inp = results[i].split(",")[0];
+    myArray.push(inp);
+  }
+  var j = 0;
+  var mySet = new Set();
+  var k = 0;
+  while (j<myArray.length) {
+    if(!mySet.has(myArray[j])) {
+      $("#city").append("<div class='cityName'>" + myArray[j] + "</div>");
+      mySet.add(myArray[j]);
+      k++;
+    }
+    if(k===5){
+      break;
+    }
+    j++;
+  }
 }
 
 function GetWeatherInfo(cityName) {
@@ -127,7 +160,7 @@ function GenerateSingleButton(city) {
     let html = "<span class='quickButtonOverall'>";
     html += "<span class='quickCityButton'><a class='noAnchorStyles' href='#' title='click for "+city+" weather information'>"+city+"</a></span>";
     html += "<span class='quickCloseButton'><a class='closeAnchorStyles' title='Clear link' href='#'>x</a></span>";
-    html += "</span>"; 
+    html += "</span>";
     $(".quickButtonsPlaceHolder").append(html);
 }
 
@@ -142,7 +175,7 @@ $(document).ready(function() {
         $("<input type='submit' value='Get weather' class='submitButtonEnter'/>").insertAfter("input#searchBox");
         $(".messageLabel").remove();
     }
-    
+
     if(!typeof(localStorage)) {
         $(".messageLabel").text("(Sorry local storage is not supported by your browser)").css("color","orange");
     } else {
@@ -153,7 +186,7 @@ $(document).ready(function() {
             cityData.forEach(GenerateQuickButtons);
         }
     }
-    
+
     $("input#searchBox").on("focus",function() {
         searchBoxIsFocused = true;
     });
@@ -164,27 +197,39 @@ $(document).ready(function() {
             $(this).val("");
         }
     });
-    
+
+    $("input#searchBox").on("keyup", function(event){
+      console.log($(this).val());
+      if($(this).val().length < 3) return;
+      suggestCityNames($(this).val());
+    })
+
+    $("body").on("click", ".cityName" , function(event){
+        GetWeatherInfo($(this).text());
+        $("#searchBox").val($(this).text());
+        $("#city").empty();
+    })
+
     $(".quickButtonsPlaceHolder").on("keydown", "a.noAnchorStyles", function(event) {
         if(event.keyCode === 13) {
             GetWeatherInfo($(this).text());
         }
     });
-    
+
     $(".quickButtonsPlaceHolder").on("click", "span.quickCityButton", function(event) {
         GetWeatherInfo($(this).find("a.noAnchorStyles").text());
     });
-    
+
     $(".clearAllButton").on("click",function() {
         localStorage.removeItem("queryedCityData");
         $(".quickButtonsPlaceHolder").empty();
     });
-    
+
     $("div.searchBoxDiv").on("click", "input.submitButtonEnter", function() {
         GetWeatherInfo($(this).prev("input#searchBox").val());
         $(this).prev("input#searchBox").val("").focus();
     });
-    
+
     $("input#searchBox").on("input", function() {
         if(detectmob()) {
             if($(this).val() === "") {
@@ -194,7 +239,7 @@ $(document).ready(function() {
             }
         }
     });
-    
+
     $(".quickButtonsPlaceHolder").on("click", "a.closeAnchorStyles", function() {
         let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
         let city = $(this).parent("span.quickCloseButton").prev("span.quickCityButton").find("a.noAnchorStyles").text();

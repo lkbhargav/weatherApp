@@ -126,31 +126,37 @@ h2 {
             width: 50%;
             float: right;
         }
-      
-      .searchBoxDiv {
-            margin: 0px 150px 0px 150px;
-            padding: 25px;
-            height: 25px;
-            width:80%;
+
+        .searchBox {
+            display : block;
+            margin : auto;
+            padding: 15px;
+            height: 15px;
+            width: auto;
+            margin-top : 10px;
         }
-      
+
+      #city{
+        margin-top : 10px;
+        text-align: center;
+      }
+
       .searchLabel {
             font-size: 18px;
             padding-right: 10px;
             vertical-align: middle;
-            display: inline;
         }
-      
+
       .actualWeatherData {
             margin: 0px 150px 0px 150px;
             padding: 10px;
         }
-      
+
       .quickButtonsPlaceHolder {
             margin: 50px 150px 0px 150px;
             padding: 25px;
         }
-      
+
       .clearAllButton {
             background-color: lightslategrey;
             color: white;
@@ -162,7 +168,7 @@ h2 {
             margin-top: 0px;
         }
 
-      .searchBox {
+      /*.searchBox {
             outline: none;
             border: 3px solid lightgray;
             border-radius: 7px;
@@ -171,5 +177,5 @@ h2 {
             padding: 0px 5px 0px 5px;
             margin: 0px;
             width: auto;
-        }
-} 
+        }*/
+}

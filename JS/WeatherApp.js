@@ -113,6 +113,10 @@ function IsAlreadyAdded(cityData, city) {
 
 function CheckDataFromButtons(city) {
     let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
+    if(!cityData) {
+        localStorage.setItem("queryedCityData", JSON.stringify([]));
+        return false;
+    }
     if(cityData === null) return true;
     for(let j=0; j<cityData.length; j++) {
         if(cityData[j].city === city) {

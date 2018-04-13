@@ -9,6 +9,10 @@ body {
     font-style: normal;
 }
 
+.mainHead {
+    margin-top: 20px;
+}
+
 h4 {
     font-size: 20px;
 }

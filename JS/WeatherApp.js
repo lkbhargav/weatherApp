@@ -79,8 +79,7 @@ function DisplayWeather(data) {
 
 function GetWeatherInfo(cityName) {
     if(!CheckDataFromButtons(cityName))
-        if(config.WEATHER_API_KEY) {
-            $.getJSON("http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid="+config.WEATHER_API_KEY+"&units=metric", function(data) {
+            $.getJSON("http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=45b059433bebd3ff4885be4bf7e59a7c&units=metric", function(data) {
                 if(data.cod === 200) {
                     let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
                     let city = data.name;
@@ -96,9 +95,6 @@ function GetWeatherInfo(cityName) {
                 $(".actualWeatherData").empty();
                 $(".messageLabel").text("("+data.responseJSON.message+")").css("color","red");
             });
-        } else {
-            $(".messageLabel").text("(Server error parsing API key.)").css("color","red");
-        }
     }
 
 function IsAlreadyAdded(cityData, city) {
@@ -113,6 +109,10 @@ function IsAlreadyAdded(cityData, city) {
 
 function CheckDataFromButtons(city) {
     let cityData = JSON.parse(localStorage.getItem("queryedCityData"));
+    if(!cityData) {
+        localStorage.setItem("queryedCityData", JSON.stringify([]));
+        return false;
+    }
     if(cityData === null) return true;
     for(let j=0; j<cityData.length; j++) {
         if(cityData[j].city === city) {
